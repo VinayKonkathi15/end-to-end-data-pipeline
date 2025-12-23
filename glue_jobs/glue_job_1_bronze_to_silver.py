@@ -158,5 +158,6 @@ glue_client.start_job_run(
 # =========================
 if pipeline_failed:
     raise Exception("❌ Pipeline failed due to CRITICAL data quality issues")
+# CI test comment
 
 print("✅ Glue Job completed successfully")
