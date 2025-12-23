@@ -1,0 +1,44 @@
+name: Glue Jobs CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate-glue-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Check Python syntax
+        run: |
+          python -m py_compile glue_jobs/glue_job_1_bronze_to_silver.py
+          python -m py_compile glue_jobs/glue_job_2_silver_to_gold.py
+
+      - name: Basic import check
+        run: |
+          python - <<EOF
+          import sys
+          import importlib.util
+
+          files = [
+              "glue_jobs/glue_job_1_bronze_to_silver.py",
+              "glue_jobs/glue_job_2_silver_to_gold.py"
+          ]
+
+          for f in files:
+              spec = importlib.util.spec_from_file_location("module.name", f)
+              module = importlib.util.module_from_spec(spec)
+              spec.loader.exec_module(module)
+
+          print("✅ Import checks passed")
+          EOF
